@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Keshia & Nicole!</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #e2d1f9 0%, #f3c6ff 50%, #b8e2fc 100%); 
+            min-height: 100vh; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px;
+            color: #444; 
+        }
+        .card { 
+            background: rgba(255, 255, 255, 0.95); 
+            width: 100%; 
+            max-width: 420px; 
+            padding: 30px; 
+            border-radius: 24px; 
+            box-shadow: 0 10px 30px rgba(138, 115, 188, 0.2); 
+            text-align: center; 
+            border: 3px solid #fff;
+        }
+        h1 { color: #7b2cbf; font-size: 24px; margin-bottom: 5px; }
+        .date-badge { display: inline-block; background: #e0fbfc; color: #0077b6; padding: 6px 15px; border-radius: 20px; font-size: 13px; font-weight: bold; margin-bottom: 15px; }
+        p { font-size: 14px; color: #555; line-height: 1.5; margin-bottom: 20px; }
+        input, textarea { width: 92%; padding: 12px; margin: 8px 0; border: 2px solid #e2d1f9; border-radius: 12px; font-size: 14px; outline: none; transition: 0.3s; background: #faf8ff; }
+        input:focus, textarea:focus { border-color: #7b2cbf; background: #fff; }
+        button { background: linear-gradient(135deg, #b5179e 0%, #48cae4 100%); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; transition: 0.2s; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .twin-btn { background: #7b2cbf; margin-top: 25px; font-size: 13px; padding: 10px; }
+        #successMsg { color: #2b9348; font-weight: bold; margin-top: 15px; display: none; }
+        .hidden { display: none; }
+        
+        /* Twins Inbox Styles */
+        .tabs-container { display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; margin: 15px 0; padding-right: 5px; }
+        .name-tab { background: #f8edeb; border: 2px solid #ffd1dc; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: bold; color: #d62828; text-align: left; transition: 0.2s; }
+        .name-tab:hover { background: #ffd1dc; }
+        .message-display { background: #f0f8ff; border-left: 4px solid #48cae4; padding: 15px; border-radius: 8px; text-align: left; margin-top: 15px; min-height: 60px; font-size: 14px; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- GUEST FORM VIEW -->
+        <div id="guestView">
+            <h1>🎈 Happy Birthday 🎈</h1>
+            <div class="date-badge">✨ Keshia & Nicole • November 21 ✨</div>
+            <p>Hey! You scanned the keychain! It's Keshia and Nicole's birthday on November 21, can you leave a message for them?</p>
+            
+            <form id="wishForm">
+                <input type="text" id="senderName" placeholder="Your Name" required>
+                <textarea id="senderWish" placeholder="Your Birthday Wish..." rows="3" required></textarea>
+                <button type="submit">Send Message 💌</button>
+            </form>
+            <p id="successMsg">✨ Message sent successfully! Thank you! ✨</p>
+            
+            <button class="twin-btn" onclick="verifyTwin()">Are you Keshia or Nicole? Click here 🔓</button>
+        </div>
+
+        <!-- TWINS LANDING PAGE VIEW -->
+        <div id="twinsView" class="hidden">
+            <h1 id="greetingTitle">🎉 Happy Birthday! 🎉</h1>
+            <p style="font-size: 13px; color: #666;">Tap a name below to read your birthday wishes:</p>
+            
+            <div class="tabs-container" id="tabsContainer">
+                <p>Loading wishes...</p>
+            </div>
+            
+>            <div class="message-display" id="messageDisplay">
+                <em>Tap any name above to view their message here!</em>
+            </div>
+            
+            <button style="background: #adb5bd; margin-top: 20px;" onclick="location.reload()">Back to Home</button>
+        </div>
+    </div>
+
+    <script>
+        const apiUrl = "https://sheetdb.io/api/v1/0x3p6zw7fxcux";
+        
+        // 1. Submit Wish Handler
+        document.getElementById('wishForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nameVal = document.getElementById('senderName').value;
+            const wishVal = document.getElementById('senderWish').value;
+            
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: { Name: nameVal, Wish: wishVal } })
+            })
+            .then(response => {
+                if(response.ok) {
+                    document.getElementById('wishForm').style.display = 'none';
+                    document.getElementById('successMsg').style.display = 'block';
+                } else {
+                    alert('Error saving wish. Try again!');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // 2. Twins Verification & Inbox Logic
+        function verifyTwin() {
+            let inputName = prompt("Enter your full name to unlock:");
+            let twin1 = "Keshia Anne P. Santos";
+            let twin2 = "Miles Nicole P. Santos";
+            
+            if (inputName === twin1 || inputName === twin2) {
+                document.getElementById('guestView').classList.add('hidden');
+                document.getElementById('twinsView').classList.remove('hidden');
+                document.getElementById('greetingTitle').innerText = "🎉 Happy Birthday, " + (inputName === twin1 ? "Keshia!" : "Nicole!") + " 🎉";
+                loadWishes();
+            } else {
+                alert("Access denied! Please enter your exact full name.");
+            }
+        }
+
+        // 3. Fetch Wishes and Create Name Tabs
+        function loadWishes() {
+            fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('tabsContainer');
+                container.innerHTML = "";
+                
+                if (data.length === 0) {
+                    container.innerHTML = "<p>No wishes yet!</p>";
+                    return;
+                }
+                
+                data.forEach(row => {
+                    let tab = document.createElement('div');
+                    tab.className = 'name-tab';
+                    tab.innerText = "💌 " + row.Name;
+                    tab.onclick = function() {
+                        document.getElementById('messageDisplay').innerHTML = 
+                            "<strong>" + row.Name + " says:</strong><br>\"" + row.Wish + "\"";
+                    };
+                    container.appendChild(tab);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching wishes:', error);
+                document.getElementById('tabsContainer').innerHTML = "<p>Error loading wishes.</p>";
+            });
+        }
+    </script>
+</body>
+</html>
